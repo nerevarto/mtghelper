@@ -73,8 +73,8 @@ change the solver, re-run that check.
   via `formatPool()`, which canonicalises the text and drops unparseable fragments.
 - **Lands are excluded from the dataset** (you play them, you don't cast them). Dual
   *sources* in the mana UI are hardcoded in `manaPool.js`, decoupled from land *cards*.
-- **Unticking every chip in a group means "no constraint"**, not "match nothing", so the
-  grid can't be emptied by a misclick. `[]` in `filters` means all-on.
+- **Clicking a chip isolates it**; clicking the isolated chip again clears the group.
+  `[]` in `filters` means all-on, so a group can never be filtered down to nothing.
 - Chip options and counts are derived from the loaded set, so a set bringing
   Planeswalker or Battle needs no code change. Each group's counts are measured against
   everything except itself.

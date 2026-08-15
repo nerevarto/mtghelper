@@ -36,14 +36,10 @@ function searchText(card) {
     .toLowerCase()
 }
 
-// [] means "all on". Toggling the last one off falls back to [], so unticking a whole
-// group reads as "no constraint" instead of emptying the grid.
-function toggleChip(selected, option, available) {
-  const current = selected.length === 0 ? available : selected
-  const next = current.includes(option)
-    ? current.filter(o => o !== option)
-    : [...current, option]
-  return next.length === 0 || next.length === available.length ? [] : next
+// Clicking a chip isolates it; clicking the isolated chip again clears the group.
+// [] means "all on", so a group can never be filtered down to nothing.
+function selectChip(selected, option) {
+  return selected.length === 1 && selected[0] === option ? [] : [option]
 }
 
 // Same idea as normalizePool: a filters object saved before a shape change degrades to
@@ -149,6 +145,10 @@ export default function App() {
       total: all.length,
       types: availableTypes,
       rarities: availableRarities,
+      // What's actually selected after dropping names the loaded set doesn't have, so
+      // the chips shown as on always match what the grid is doing.
+      activeTypes,
+      activeRarities,
       typeCounts: countBy(byRarity, c => typesIndex.get(c.id)),
       rarityCounts: countBy(byType, c => [c.rarity]),
     }
@@ -156,19 +156,16 @@ export default function App() {
 
   const handleToggleType = useCallback(
     option =>
-      setFilters(f => {
-        const current = normalizeFilters(f)
-        return { ...current, types: toggleChip(current.types, option, view.types) }
-      }),
-    [setFilters, view.types],
+      setFilters(f => ({ ...normalizeFilters(f), types: selectChip(view.activeTypes, option) })),
+    [setFilters, view.activeTypes],
   )
   const handleToggleRarity = useCallback(
     option =>
-      setFilters(f => {
-        const current = normalizeFilters(f)
-        return { ...current, rarities: toggleChip(current.rarities, option, view.rarities) }
-      }),
-    [setFilters, view.rarities],
+      setFilters(f => ({
+        ...normalizeFilters(f),
+        rarities: selectChip(view.activeRarities, option),
+      })),
+    [setFilters, view.activeRarities],
   )
   const handleSearch = useCallback(
     value => setFilters(f => ({ ...normalizeFilters(f), search: value })),
@@ -205,11 +202,11 @@ export default function App() {
           <FilterBar
             types={view.types}
             typeCounts={view.typeCounts}
-            selectedTypes={filters.types}
+            selectedTypes={view.activeTypes}
             onToggleType={handleToggleType}
             rarities={view.rarities}
             rarityCounts={view.rarityCounts}
-            selectedRarities={filters.rarities}
+            selectedRarities={view.activeRarities}
             onToggleRarity={handleToggleRarity}
             search={filters.search}
             onSearchChange={handleSearch}

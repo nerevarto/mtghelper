@@ -1,6 +1,6 @@
 // Chips are derived from the loaded set, so a future set bringing Planeswalker or Battle
-// just works. An empty selection means "no constraint from this group" rather than "match
-// nothing", so the grid can't be emptied by a misclick.
+// just works. Clicking a chip isolates it; clicking the isolated chip again clears the
+// group. An empty selection means "no constraint", so the grid can't be emptied.
 function ChipGroup({ label, options, counts, selected, onToggle }) {
   const allOn = selected.length === 0
   return (
